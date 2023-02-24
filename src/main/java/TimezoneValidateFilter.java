@@ -1,6 +1,7 @@
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,10 +15,9 @@ public class TimezoneValidateFilter extends HttpFilter {
         String timeZone = req.getParameter("timezone");
         if (timeZone != null) {
             try {
-                if (timeZone.substring(0, 3).equals("UTC") && timeZone.substring(3, 4).equals(" ")) {
-                    timeZone = "UTC+" + timeZone.substring(4);
-                }
+                timeZone = timeZone.replace(" ", "+");
                 ZoneId.of(timeZone);
+                res.addCookie(new Cookie("timezone", timeZone));
             } catch (Exception e) {
                 res.getWriter().write("Invalid timezone");
                 res.setStatus(400);
